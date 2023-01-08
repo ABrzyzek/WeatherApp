@@ -41,6 +41,4 @@ def read_data_from_csv(filename: str, dataframe: bool = False) -> Union[List[Wea
     list_weather = []
     for row in data_set.T.to_dict().values():
         list_weather.append(Weather(**row))
-    if dataframe:
-        return data_set
-    return list_weather
+    return data_set if dataframe else list_weather
