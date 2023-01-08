@@ -30,4 +30,7 @@ def get_weather_for_station(station: str, start_date: datetime, end_date: dateti
 def save_data_to_csv(weather_list: List[Weather]) -> None:
     data_set = pd.DataFrame([model.dict() for model in weather_list])
     start_date, end_date, city = weather_list[0].date.date(), weather_list[-1].date.date(), weather_list[0].city
-    data_set.to_csv(f'{city}_{start_date}_{end_date}.csv', index=False, sep=';')
+    data_set.to_csv(rf'CSV\{city}_{start_date}_{end_date}.csv', index=False, sep=';')
+
+
+save_data_to_csv(get_weather_for_station(station='EPWA', start_date=datetime(2023, 1, 5)))
