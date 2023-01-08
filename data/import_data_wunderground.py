@@ -3,7 +3,7 @@ import json
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta, date
-from typing import List
+from typing import List, Union
 from urllib.request import urlopen
 
 from data.schemas import Weather
@@ -35,10 +35,12 @@ def save_data_to_csv(weather_list: List[Weather]) -> None:
     data_set.to_csv(rf'CSV\{city}_{start_date}_{end_date}.csv', index=False, sep=';')
 
 
-def read_data_from_csv(filename: str) -> List[Weather]:
+def read_data_from_csv(filename: str, dataframe: bool = False) -> Union[List[Weather], pd.DataFrame]:
     data_set = pd.read_csv(rf'CSV/{filename}', sep=';')
     data_set = data_set.replace(np.nan, None)
     list_weather = []
     for row in data_set.T.to_dict().values():
         list_weather.append(Weather(**row))
+    if dataframe:
+        return data_set
     return list_weather
