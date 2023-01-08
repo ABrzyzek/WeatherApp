@@ -4,7 +4,7 @@ import yaml
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta, date
-from typing import List, Union
+from typing import List
 from urllib.request import urlopen
 
 from data.schemas import Weather, Station
@@ -67,7 +67,7 @@ def get_code_for_city(city_name: str) -> str:
     return ''
 
 
-def update_csv_for_new_data(filename: str):
+def update_csv_for_new_data(filename: str) -> None:
     list_weather = read_data_from_csv(filename)
     last_date = list_weather[-1].date.date()
     last_date = datetime(last_date.year, last_date.month, last_date.day)
