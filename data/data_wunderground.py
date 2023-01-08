@@ -10,8 +10,7 @@ from urllib.request import urlopen
 from data.schemas import Weather, Station
 
 
-def get_weather_for_station(station_code: str, start_date: datetime, end_date: datetime = date.today()) -> List[
-    Weather]:
+def get_weather_for_station(station_code: str, start_date: datetime, end_date: datetime = date.today()) -> List[Weather]:
     list_weather = []
     while start_date.date() != end_date + timedelta(days=1):
         date = start_date.strftime('%Y%m%d')
