@@ -18,3 +18,4 @@ class Weather(BaseModel):
     visibility: int
     heat_index: int
     weather_status: str
+    user_notes: Optional[str]
