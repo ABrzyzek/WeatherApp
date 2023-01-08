@@ -19,3 +19,8 @@ class Weather(BaseModel):
     heat_index: int
     weather_status: str
     user_notes: Optional[str]
+
+
+class Station(BaseModel):
+    name: str
+    code: str
