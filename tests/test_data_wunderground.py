@@ -1,7 +1,18 @@
 from data.data_wunderground import *
-from datetime import datetime
+from datetime import date, datetime, timedelta
 import pandas as pd
 import os
+
+def test_get_weather_for_station():
+    #given
+    station_code = "EPWA"
+    start_date = datetime(2023, 1, 14)
+    end_date = datetime(2023, 1, 15)
+    #when
+    result = get_weather_for_station(station_code, start_date, end_date)
+    #then
+    assert (isinstance(result, List))
+    assert all(isinstance(x, Weather) for x in result)
 
 def test_save_data_to_csv():
     #given
@@ -15,6 +26,7 @@ def test_save_data_to_csv():
     expected_data = pd.DataFrame([model.dict() for model in weather_list])
     assert os.path.isfile("files\\Warsaw_2023-01-12_2023-01-13.csv")
     assert data_set.to_dict() == expected_data.to_dict()
+    os.remove("files\\Warsaw_2023-01-12_2023-01-13.csv")
 
 def test_try_to_read_data_from_csv():
     try:
@@ -81,3 +93,18 @@ def test_get_code_for_city():
     second_code = get_code_for_city(city_names[1])
     #then
     assert first_code == proper_codes[0] and second_code == proper_codes[1]
+
+def test_update_csv_for_new_data():
+    #given
+    start_date = datetime.now() - timedelta(days=2)
+    data = [Weather(date=start_date, city="Warsaw", temperature=20, dev_point=10, humidity=50, wind="N", wind_speed=5, wind_gust=10, pressure=1013, precipitation=0, visibility=10, heat_index=20, weather_status="Sunny")]
+    current_time = datetime.now()
+    current_time = current_time.date()
+    start_date = start_date.date()
+    #when
+    save_data_to_csv(data)
+    update_csv_for_new_data(f"Warsaw_{start_date}_{start_date}.csv")
+    #then
+    assert os.path.exists(f"files\\Warsaw_{start_date}_{current_time}.csv")
+    os.remove(f"files\\Warsaw_{start_date}_{start_date}.csv")
+    os.remove(f"files\\Warsaw_{start_date}_{current_time}.csv")

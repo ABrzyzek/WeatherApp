@@ -1,3 +1,0 @@
-date;city;temperature;dev_point;humidity;wind;wind_speed;wind_gust;pressure;precipitation;visibility;heat_index;weather_status;user_notes
-2023-01-12;Warsaw;0;1;2;x;3;;4.0;;5;6;Fair;
-2023-01-13;Warsaw;0;11;21;x;31;;41.0;;51;61;Fair;
