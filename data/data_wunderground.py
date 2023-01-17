@@ -38,7 +38,7 @@ def save_data_to_csv(weather_list: List[Weather]) -> None:
 
 
 def read_data_from_csv(filename: str) -> List[Weather]:
-    data_set = pd.read_csv(rf'files/{filename}', sep=';')
+    data_set = pd.read_csv(rf'files/{filename}', sep=';')#sep=","
     data_set = data_set.replace(np.nan, None)
     list_weather = []
     for row in data_set.T.to_dict().values():
