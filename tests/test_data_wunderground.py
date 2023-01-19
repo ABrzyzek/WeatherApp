@@ -16,21 +16,23 @@ def test_get_weather_for_station():
 
 def test_save_data_to_csv():
     #given
-    weather_list = [Weather(date=datetime(2023,1,12), city="Warsaw", temperature=0, dev_point=1, humidity=2, wind="x", wind_speed=3, pressure=4, visibility=5, heat_index=6, weather_status="Fair"), Weather(date=datetime(2023,1,13), city="Warsaw", temperature=0, dev_point=11, humidity=21, wind="x", wind_speed=31, pressure=41, visibility=51, heat_index=61, weather_status="Fair")]
+    weather_list = [Weather(date=datetime(2023,1,12), city="Warsaw", temperature=0, dev_point=1, humidity=2, wind="x",
+                            wind_speed=3, pressure=4, visibility=5, heat_index=6, weather_status="Fair"),
+                    Weather(date=datetime(2023,1,13), city="Warsaw", temperature=0, dev_point=11, humidity=21, wind="x",
+                            wind_speed=31, pressure=41, visibility=51, heat_index=61, weather_status="Fair")]
     #when
     save_data_to_csv(weather_list)
     #then
-    data_set = pd.read_csv("files/Warsaw_2023-01-12_2023-01-13.csv", sep=";")
+    data_set = pd.read_csv("data/files/Warsaw_2023-01-12_2023-01-13.csv", sep=",")
     data_set["date"] = pd.to_datetime(data_set["date"])
-    data_set = data_set.replace(np.nan, None)
+    data_set = data_set.where(pd.notnull(data_set), None)
     expected_data = pd.DataFrame([model.dict() for model in weather_list])
-    assert os.path.isfile("files\\Warsaw_2023-01-12_2023-01-13.csv")
+    assert os.path.isfile("data/files/Warsaw_2023-01-12_2023-01-13.csv")
     assert data_set.to_dict() == expected_data.to_dict()
-    os.remove("files\\Warsaw_2023-01-12_2023-01-13.csv")
 
 def test_try_to_read_data_from_csv():
     try:
-        read_data_from_csv("Warsaw_2023-01-01_2023-01-10.csv")
+        read_data_from_csv("test.csv")
     except:
         assert False
 
@@ -43,7 +45,7 @@ def test_read_data_from_csv():
     pressure = 29.57
     user_notes = None
     #when
-    list_weather = read_data_from_csv("Warsaw_2023-01-01_2023-01-10.csv")
+    list_weather = read_data_from_csv("test.csv")
     #then
     assert city_name == list_weather[0].city
     assert temperature == list_weather[0].temperature
@@ -54,7 +56,7 @@ def test_read_data_from_csv():
 
 def test_try_to_get_data_frame_from_csv():
     try:
-        get_data_frame_from_csv("Warsaw_2023-01-01_2023-01-10.csv")
+        get_data_frame_from_csv("test.csv")
     except:
         assert False
 
@@ -65,7 +67,7 @@ def test_get_data_frame_from_csv():
     precipitation = None
     weather_status = "Fair"
     #when
-    data_frame_weather = get_data_frame_from_csv("Warsaw_2023-01-01_2023-01-10.csv")
+    data_frame_weather = get_data_frame_from_csv("test.csv")
     #then
     assert date == data_frame_weather["date"][0].strftime("%Y-%m-%d %H:%M:%S")
     assert weather_status == data_frame_weather["weather_status"][0]
@@ -97,14 +99,20 @@ def test_get_code_for_city():
 def test_update_csv_for_new_data():
     #given
     start_date = datetime.now() - timedelta(days=2)
-    data = [Weather(date=start_date, city="Warsaw", temperature=20, dev_point=10, humidity=50, wind="N", wind_speed=5, wind_gust=10, pressure=1013, precipitation=0, visibility=10, heat_index=20, weather_status="Sunny")]
+    end_date = start_date + timedelta(days=1)
+    data = [Weather(date=start_date, city="Warsaw", temperature=20, dev_point=10, humidity=50, wind="N", wind_speed=5,
+                    wind_gust=10, pressure=1013, precipitation=0, visibility=10, heat_index=20, weather_status="Sunny"),
+            Weather(date=end_date, city="Warsaw", temperature=20, dev_point=10, humidity=50, wind="N", wind_speed=5,
+                    wind_gust=10, pressure=1013, precipitation=0, visibility=10, heat_index=20, weather_status="Sunny")]
     current_time = datetime.now()
     current_time = current_time.date()
     start_date = start_date.date()
+    end_date = end_date.date()
     #when
     save_data_to_csv(data)
-    update_csv_for_new_data(f"Warsaw_{start_date}_{start_date}.csv")
+    print(f"Warsaw_{start_date}_{end_date}.csv")
+    update_csv_for_new_data(f"Warsaw_{start_date}_{end_date}.csv")
     #then
-    assert os.path.exists(f"files\\Warsaw_{start_date}_{current_time}.csv")
-    os.remove(f"files\\Warsaw_{start_date}_{start_date}.csv")
-    os.remove(f"files\\Warsaw_{start_date}_{current_time}.csv")
+    assert os.path.exists(f"data/files/Warsaw_{start_date}_{current_time}.csv")
+    os.remove(f"data/files/Warsaw_{start_date}_{end_date}.csv")
+    os.remove(f"data/files/Warsaw_{start_date}_{current_time}.csv")
