@@ -34,11 +34,11 @@ def get_weather_for_station(station_code: str, start_date: datetime, end_date: d
 def save_data_to_csv(weather_list: List[Weather]) -> None:
     data_set = pd.DataFrame([model.dict() for model in weather_list])
     start_date, end_date, city = weather_list[0].date.date(), weather_list[-1].date.date(), weather_list[0].city
-    data_set.to_csv(rf'files\{city}_{start_date}_{end_date}.csv', index=False, sep=';')
+    data_set.to_csv(rf'files\{city}_{start_date}_{end_date}.csv', index=False, sep=',')
 
 
 def read_data_from_csv(filename: str) -> List[Weather]:
-    data_set = pd.read_csv(rf'files/{filename}', sep=';')
+    data_set = pd.read_csv(rf'files/{filename}', sep=',')
     data_set = data_set.replace(np.nan, None)
     list_weather = []
     for row in data_set.T.to_dict().values():
