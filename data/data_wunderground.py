@@ -34,14 +34,16 @@ def get_weather_for_station(station_code: str, start_date: datetime, end_date: d
 def save_data_to_csv(weather_list: List[Weather]) -> None:
     data_set = pd.DataFrame([model.dict() for model in weather_list])
     start_date, end_date, city = weather_list[0].date.date(), weather_list[-1].date.date(), weather_list[0].city
-    data_set.to_csv(rf'files\{city}_{start_date}_{end_date}.csv', index=False, sep=';')
+    data_set.to_csv(rf'data/files/{city}_{start_date}_{end_date}.csv', index=False, sep=',')
 
 
 def read_data_from_csv(filename: str) -> List[Weather]:
-    data_set = pd.read_csv(rf'files/{filename}', sep=';')#sep=","
-    data_set = data_set.replace(np.nan, None)
+    data_set = pd.read_csv(rf'data/files/{filename}', sep=',')
     list_weather = []
     for row in data_set.T.to_dict().values():
+        for k, v in row.items():
+            if pd.isna(v):
+                row[k] = None
         list_weather.append(Weather(**row))
     return list_weather
 
@@ -52,7 +54,7 @@ def get_data_frame_from_csv(filename: str) -> pd.DataFrame:
 
 def get_station_names() -> List[Station]:
     list_stations = []
-    with open(r'files\stations.yaml') as file:
+    with open(r'data/files/stations.yaml') as file:
         stations = yaml.full_load(file)
         for name, code in stations.items():
             list_stations.append(Station(name=name, code=code))
