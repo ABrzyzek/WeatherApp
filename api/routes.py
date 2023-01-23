@@ -5,9 +5,12 @@ from typing import List
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 
-from data.data_wunderground import get_station_names, read_data_from_csv, get_weather_for_station, save_data_to_csv, update_csv_for_new_data
-from data.schemas import Station, Weather
+from data.data_wunderground import get_station_names, read_data_from_csv, get_weather_for_station, save_data_to_csv, \
+    update_csv_for_new_data
+from data.schemas import Station, Weather, Prediction, ChartType, Variables
+from model.forecast import get_prediction_holt_winters, get_data_frame_for_variable, get_dashboard_for_data
 
+FILE_NAME = 'test.csv'
 app = FastAPI()
 
 
@@ -21,22 +24,24 @@ async def stations_list():
     return get_station_names()
 
 
-@app.get('/weather/{filename}', response_model=List[Weather])
-async def station(filename: str):
-    return read_data_from_csv(f'{filename}.csv')
+@app.get('/weather', response_model=List[Weather])
+async def weather():
+    return read_data_from_csv(FILE_NAME)
 
 
 @app.get('/chart/{variable}')
-async def chart(variable: str, chart_type: str):
-    if os.path.exists(f'data/files/{variable}_chart.png'):
-        return FileResponse(f'data/files/{variable}_chart.png')
+async def chart(variable: Variables, chart_type: ChartType):
+    print(chart_type)
+    if chart_type == ChartType.chart:
+        get_dashboard_for_data(get_data_frame_for_variable(file_name=FILE_NAME, variable=variable), file_name=FILE_NAME)
     else:
-        return {500: 'error'}
+        get_prediction_holt_winters(get_data_frame_for_variable(file_name=FILE_NAME, variable=variable), file_name=FILE_NAME)
+    return FileResponse(f'data/files/{variable}{chart_type}')
 
 
-@app.get('/prediction')
-async def prediction(variable: str):
-    pass
+@app.get('/prediction', response_model=Prediction)
+async def prediction(variable: Variables):
+    return get_prediction_holt_winters(get_data_frame_for_variable(file_name=FILE_NAME, variable=variable), file_name=FILE_NAME)
 
 
 @app.get('/csvs')
@@ -45,9 +50,20 @@ async def csv_names():
     return [string for string in file_list if string.endswith(extension)]
 
 
-@app.post('/choose_csv')
-async def change_csv():
-    pass
+@app.get('/dashboards')
+async def dashboards_names():
+    file_list, extension = os.listdir('data/files'), '.png'
+    return [string for string in file_list if string.endswith(extension)]
+
+
+@app.put('/choose_csv')
+async def change_csv(file_name: str):
+    if os.path.exists(f'data/files/{file_name}'):
+        global FILE_NAME
+        FILE_NAME = file_name
+        return {200: f'success, file name: {FILE_NAME}'}
+    else:
+        return {500: 'error'}
 
 
 @app.post('/create_csv')
@@ -67,7 +83,7 @@ async def create_csv(station_name: str, start_date: date, end_date: date = date.
 
 @app.post('/update_csv')
 async def create_csv(filename: str):
-    if f'{filename}.csv' in os.listdir('data/files'):
+    if filename in os.listdir('data/files'):
         update_csv_for_new_data(filename)
         return {200: 'success'}
     return {500: 'error'}
