@@ -5,6 +5,14 @@ from pydantic import BaseModel
 from datetime import datetime
 
 
+class Variables(str, Enum):
+    temperature = 'temperature'
+    dev_point = 'dev_point'
+    humidity = 'humidity'
+    pressure = 'pressure'
+    heat_index = 'heat_index'
+
+
 class Weather(BaseModel):
     date: datetime
     city: str
@@ -31,10 +39,6 @@ class ChartType(str, Enum):
     chart = '_chart.png'
     chart_prediction = '_prediction_chart.png'
     chart_test_prediction = '_prediction_test_chart.png'
-
-
-class Chart(BaseModel):
-    name: ChartType
 
 
 class PredictionRow(BaseModel):
