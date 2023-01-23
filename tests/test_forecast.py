@@ -36,3 +36,13 @@ def test_get_dashboard_for_data():
     #then
     assert os.path.exists(f"data/files/temperature_chart.png")
     os.remove(f"data/files/temperature_chart.png")
+
+def test_get_prediction_holt_winters():
+    #given
+    data = get_data_frame_for_variable(file_name="test.csv", variable="temperature")
+    #when
+    result = get_prediction_holt_winters(data)
+    #then
+    assert len(result.prediction) == 6
+    os.remove(f"data/files/temperature_prediction_chart.png")
+    os.remove(f"data/files/temperature_prediction_test_chart.png")
