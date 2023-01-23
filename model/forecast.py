@@ -21,16 +21,16 @@ def get_data_frame_for_variable(file_name: str, variable: str) -> Union[pd.DataF
     return None
 
 
-def get_dashboard_for_data(data: pd.DataFrame):
+def get_dashboard_for_data(data: pd.DataFrame, file_name: str):
     '''!
     Funkcja pozwalająca na uzyskanie nazwy kolumny (nazwy zmiennej) oraz generująca wykres uzyskanej zmiennej
     '''
     name = data.columns.values.tolist()[-1]
-    data[[name]].plot(title=f'{name} dashboard',figsize = (12,8))
+    data[[name]].plot(title=f'{name} dashboard - {file_name}', figsize=(12, 8))
     plt.savefig(f"data/files/{name}_chart.png", bbox_inches='tight')
 
 
-def get_prediction_holt_winters(data: pd.DataFrame) -> Prediction:
+def get_prediction_holt_winters(data: pd.DataFrame, file_name: str) -> Prediction:
     '''!
     Funkcja tworząca model predykcji Holta Wintera dla 6 kolejnych okresów (3 godz.).
     Generuje wykres predykcji oraz wykres zależności testu i predykcji.
@@ -46,12 +46,12 @@ def get_prediction_holt_winters(data: pd.DataFrame) -> Prediction:
     test_predictions = fitted_model.forecast(steps=n)
     train_weather.plot(legend=True, label='TRAIN')
     test_weather.plot(legend=True, label='TEST', figsize=(6, 4))
-    test_predictions.plot(legend=True,label='PREDICTION')
+    test_predictions.plot(legend=True, label='PREDICTION')
     plt.savefig(f"data/files/{name}_prediction_chart.png", bbox_inches='tight')
     plt.clf()
     test_weather.plot(legend=True, label='TEST', figsize=(9, 6))
     test_predictions.plot(legend=True, label='PREDICTION')
-    plt.title('Train, Test and Predicted Test using Holt Winters')
+    plt.title(f'Train, Test and Predicted Test using Holt Winters - {file_name}')
     plt.savefig(f"data/files/{name}_prediction_test_chart.png", bbox_inches='tight')
     error = Error(mean_absolute_error=mean_absolute_error(test_weather, test_predictions),
                   mean_squared_error=mean_squared_error(test_weather, test_predictions))
