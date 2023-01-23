@@ -43,6 +43,11 @@ def get_prediction_holt_winters(data: pd.DataFrame):
     train_weather.plot(legend=True, label='TRAIN')
     test_weather.plot(legend=True, label='PREDICTION', figsize=(6, 4))
     # test_predictions.plot(legend=True,label='PREDICTION')
+
+    test_weather.plot(legend=True, label='TEST', figsize=(9, 6))
+    test_predictions.plot(legend=True, label='PREDICTION')
+
+    plt.title('Train, Test and Predicted Test using Holt Winters')
     plt.show()
 
     error = [mean_absolute_error(test_weather, test_predictions), mean_squared_error(test_weather, test_predictions)]
