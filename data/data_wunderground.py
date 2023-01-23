@@ -12,6 +12,9 @@ from data.schemas import Weather, Station
 
 def get_weather_for_station(station_code: str, start_date: datetime, end_date: datetime = date.today()) -> List[
     Weather]:
+    '''!
+    Funkacja która pobiera dane w określonym przedziale czasowym z określonej stacji pogodowej
+    '''
     list_weather = []
     while start_date != end_date + timedelta(days=1):
         date = start_date.strftime('%Y%m%d')
@@ -32,12 +35,18 @@ def get_weather_for_station(station_code: str, start_date: datetime, end_date: d
 
 
 def save_data_to_csv(weather_list: List[Weather]) -> None:
+    '''!
+    Funkcja zapisująca dane do pliku csv
+    '''
     data_set = pd.DataFrame([model.dict() for model in weather_list])
     start_date, end_date, city = weather_list[0].date.date(), weather_list[-1].date.date(), weather_list[0].city
     data_set.to_csv(rf'data/files/{city}_{start_date}_{end_date}.csv', index=False, sep=',')
 
 
 def read_data_from_csv(filename: str) -> List[Weather]:
+    """!
+    Funkcja wczytująca z pliku csv do listy
+    """
     data_set = pd.read_csv(rf'data/files/{filename}', sep=',')
     list_weather = []
     for row in data_set.T.to_dict().values():
@@ -49,10 +58,16 @@ def read_data_from_csv(filename: str) -> List[Weather]:
 
 
 def get_data_frame_from_csv(filename: str) -> pd.DataFrame:
+    '''!
+    Funkcja otczytująca z pliku csv do ramki danych
+    '''
     return pd.DataFrame([model.dict() for model in read_data_from_csv(filename)])
 
 
 def get_station_names() -> List[Station]:
+    """!
+    Funkcja otczytująca nazwę stacji pogodowej
+    """
     list_stations = []
     with open(r'data/files/stations.yaml') as file:
         stations = yaml.full_load(file)
@@ -62,6 +77,9 @@ def get_station_names() -> List[Station]:
 
 
 def get_code_for_city(city_name: str) -> str:
+    """!
+    Funkcja otczytująca nazwę miasta w której znajduje się stacja pogodowa
+    """
     stations = get_station_names()
     for station in stations:
         if city_name == station.name:
@@ -70,6 +88,9 @@ def get_code_for_city(city_name: str) -> str:
 
 
 def update_csv_for_new_data(filename: str) -> None:
+    """!
+    Funkcja pozwalająca updatować dane do pilku csv
+    """
     list_weather = read_data_from_csv(filename)
     last_date = list_weather[-1].date.date()
     last_date = datetime(last_date.year, last_date.month, last_date.day)
