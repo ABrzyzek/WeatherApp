@@ -40,7 +40,7 @@ async def chart(variable: Variables, chart_type: ChartType):
 
 
 @app.get('/prediction', response_model=Prediction)
-async def prediction(variable: str):
+async def prediction(variable: Variables):
     return get_prediction_holt_winters(get_data_frame_for_variable(file_name=FILE_NAME, variable=variable), file_name=FILE_NAME)
 
 
