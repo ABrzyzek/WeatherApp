@@ -41,8 +41,8 @@ def get_prediction_holt_winters(data: pd.DataFrame):
 
     x.plot(legend=True, title='temperature')
     train_weather.plot(legend=True, label='TRAIN')
-    test_weather.plot(legend=True, label='PREDICTION', figsize=(6, 4))
-    # test_predictions.plot(legend=True,label='PREDICTION')
+    test_weather.plot(legend=True, label='TEST', figsize=(6, 4))
+    test_predictions.plot(legend=True,label='PREDICTION')
 
     test_weather.plot(legend=True, label='TEST', figsize=(9, 6))
     test_predictions.plot(legend=True, label='PREDICTION')
