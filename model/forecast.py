@@ -1,6 +1,8 @@
 from typing import Union
 import pandas as pd
 from matplotlib import pyplot as plt
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+from sklearn.metrics import mean_absolute_error,mean_squared_error
 
 from data.data_wunderground import get_data_frame_from_csv
 
@@ -24,4 +26,24 @@ def get_dashboard_for_data(data: pd.DataFrame):
 def get_prediction_holt_winters(data: pd.DataFrame):
     name = data.columns.values.tolist()[-1]
     print(data[name])
-    pass
+
+    weather = pd.read_csv('weather.csv', sep=',', index_col='date', parse_dates=True)
+    x = weather['temperature']
+
+    n = 6
+    a = int(len(x))
+    train_weather = x[:a - n]
+    test_weather = x[a - n:]
+    print(test_weather)
+
+    fitted_model = ExponentialSmoothing(train_weather, trend='mul').fit()
+    test_predictions = fitted_model.forecast(steps=n)
+
+    x.plot(legend=True, title='temperature')
+    train_weather.plot(legend=True, label='TRAIN')
+    test_weather.plot(legend=True, label='PREDICTION', figsize=(6, 4))
+    # test_predictions.plot(legend=True,label='PREDICTION')
+    plt.show()
+
+    error = [mean_absolute_error(test_weather, test_predictions), mean_squared_error(test_weather, test_predictions)]
+    return test_predictions, error
