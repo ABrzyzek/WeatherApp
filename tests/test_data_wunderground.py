@@ -1,5 +1,5 @@
 from data.data_wunderground import *
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 import pandas as pd
 import os
 
@@ -25,10 +25,11 @@ def test_save_data_to_csv():
     #then
     data_set = pd.read_csv("data/files/Warsaw_2023-01-12_2023-01-13.csv", sep=",")
     data_set["date"] = pd.to_datetime(data_set["date"])
-    data_set = data_set.where(pd.notnull(data_set), None)
+    data_set = data_set.astype(object).replace(np.nan, None)
     expected_data = pd.DataFrame([model.dict() for model in weather_list])
     assert os.path.isfile("data/files/Warsaw_2023-01-12_2023-01-13.csv")
     assert data_set.to_dict() == expected_data.to_dict()
+    os.remove(f"data/files/Warsaw_2023-01-12_2023-01-13.csv")
 
 def test_try_to_read_data_from_csv():
     try:
@@ -110,7 +111,6 @@ def test_update_csv_for_new_data():
     end_date = end_date.date()
     #when
     save_data_to_csv(data)
-    print(f"Warsaw_{start_date}_{end_date}.csv")
     update_csv_for_new_data(f"Warsaw_{start_date}_{end_date}.csv")
     #then
     assert os.path.exists(f"data/files/Warsaw_{start_date}_{current_time}.csv")
