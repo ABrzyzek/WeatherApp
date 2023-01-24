@@ -32,7 +32,7 @@ def test_get_dashboard_for_data():
     #given
     data = pd.DataFrame({"temperature": [41, 39, 41, 38, 40]}, index=pd.to_datetime(["2023-01-07 21:30:00", "2023-01-07 22:00:00", "2023-01-07 22:30:00", "2023-01-07 23:00:00", "2023-01-07 23:30:00"]))
     #when
-    get_dashboard_for_data(data)
+    get_dashboard_for_data(data, "file name")
     #then
     assert os.path.exists(f"data/files/temperature_chart.png")
     os.remove(f"data/files/temperature_chart.png")
@@ -41,7 +41,7 @@ def test_get_prediction_holt_winters():
     #given
     data = get_data_frame_for_variable(file_name="test.csv", variable="temperature")
     #when
-    result = get_prediction_holt_winters(data)
+    result = get_prediction_holt_winters(data, "file name")
     #then
     assert len(result.prediction) == 6
     os.remove(f"data/files/temperature_prediction_chart.png")
